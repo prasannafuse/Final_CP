@@ -1,0 +1,114 @@
+<%- include('../../partials/header') %>
+
+<div class="container">
+    <h1 class="mb-4">Assign Provider to Booking</h1>
+    
+    <%- include('../../partials/messages') %>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Available Providers</h5>
+                </div>
+                <div class="card-body">
+                    <% if(providers && providers.length > 0) { %>
+                        <form action="/admin/bookings/assign/<%= booking._id %>" method="POST">
+                            <div class="mb-4">
+                                <div class="form-text mb-3">Select a provider who is available to perform this service.</div>
+                                <div class="row">
+                                    <% providers.forEach(provider => { %>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="providerId" id="provider<%= provider._id %>" value="<%= provider._id %>" required>
+                                                        <label class="form-check-label" for="provider<%= provider._id %>">
+                                                            <h5 class="mb-1"><%= provider.name %></h5>
+                                                            <p class="text-muted mb-2">
+                                                                <i class="bi bi-envelope me-1"></i> <%= provider.email %><br>
+                                                                <i class="bi bi-telephone me-1"></i> <%= provider.phone %>
+                                                            </p>
+                                                            <div class="d-flex flex-wrap gap-1 mt-2">
+                                                                <% if(provider.serviceCategories && provider.serviceCategories.length > 0) { %>
+                                                                    <% provider.serviceCategories.forEach(category => { %>
+                                                                        <span class="badge bg-info"><%= category %></span>
+                                                                    <% }); %>
+                                                                <% } %>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary">Assign Provider</button>
+                            </div>
+                            <div class="text-center">
+                                <a href="/admin/bookings" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    <% } else { %>
+                        <div class="alert alert-warning">
+                            <p class="mb-0">No available providers found for this service. Please add providers or check their availability.</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="/admin/providers/add" class="btn btn-primary">Add New Provider</a>
+                            <a href="/admin/bookings" class="btn btn-outline-secondary">Back to Bookings</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Booking Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="card-subtitle mb-2 text-muted">Service</h6>
+                        <p class="card-text fs-5"><%= booking.service.name %></p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="card-subtitle mb-2 text-muted">Date & Time</h6>
+                        <p class="card-text"><%= new Date(booking.date).toLocaleDateString() %> at <%= booking.time %></p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="card-subtitle mb-2 text-muted">Customer</h6>
+                        <p class="card-text">
+                            <%= booking.user.name %><br>
+                            <small class="text-muted">
+                                <%= booking.user.email %><br>
+                                <%= booking.user.phone %>
+                            </small>
+                        </p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="card-subtitle mb-2 text-muted">Location</h6>
+                        <p class="card-text">
+                            <%= booking.address %><br>
+                            <%= booking.city %>
+                        </p>
+                    </div>
+                    
+                    <% if(booking.notes) { %>
+                        <div class="mb-3">
+                            <h6 class="card-subtitle mb-2 text-muted">Customer Notes</h6>
+                            <p class="card-text small fst-italic"><%= booking.notes %></p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../../partials/footer') %> 

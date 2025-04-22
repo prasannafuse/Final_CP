@@ -1,0 +1,177 @@
+<%- include('../../partials/header') %>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><%= provider.name %></h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/providers">Service Providers</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">View Provider</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/admin/providers/edit/<%= provider._id %>" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit Provider
+            </a>
+        </div>
+    </div>
+
+    <%- include('../../partials/messages') %>
+
+    <div class="row">
+        <!-- Provider Information Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Provider Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-circle fa-4x text-muted mb-2"></i>
+                        <h4><%= provider.name %></h4>
+                        <span class="badge <%= provider.isAvailable ? 'bg-success' : 'bg-danger' %>">
+                            <%= provider.isAvailable ? 'Active' : 'Inactive' %>
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Email:</strong></p>
+                        <p><a href="mailto:<%= provider.email %>"><%= provider.email %></a></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Phone:</strong></p>
+                        <p><%= provider.phone || 'Not provided' %></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Account Created:</strong></p>
+                        <p><%= new Date(provider.createdAt).toLocaleDateString() %></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Last Updated:</strong></p>
+                        <p><%= new Date(provider.updatedAt).toLocaleDateString() %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Categories and Stats -->
+        <div class="col-md-8 mb-4">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Service Categories</h5>
+                </div>
+                <div class="card-body">
+                    <% if (provider.serviceCategories && provider.serviceCategories.length > 0) { %>
+                        <div class="row">
+                            <% provider.serviceCategories.forEach(category => { %>
+                                <div class="col-md-4 mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        <%= category %>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted mb-0">No service categories assigned.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Job Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3">
+                                <h3 class="text-primary mb-1"><%= currentJobsCount || 0 %></h3>
+                                <p class="text-muted mb-0">Current Jobs</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3">
+                                <h3 class="text-success mb-1"><%= bookings.filter(b => b.status === 'completed').length %></h3>
+                                <p class="text-muted mb-0">Completed Jobs</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3">
+                                <h3 class="text-info mb-1"><%= bookings.length %></h3>
+                                <p class="text-muted mb-0">Total Jobs</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Recent Bookings</h5>
+            <a href="/admin/bookings?provider=<%= provider._id %>" class="btn btn-light btn-sm">View All</a>
+        </div>
+        <div class="card-body">
+            <% if (bookings && bookings.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Service</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% bookings.forEach(booking => { %>
+                                <tr>
+                                    <td><small class="text-muted">#<%= booking._id.toString().slice(-6) %></small></td>
+                                    <td><%= booking.service ? booking.service.name : 'N/A' %></td>
+                                    <td><%= booking.user ? booking.user.name : 'N/A' %></td>
+                                    <td><%= new Date(booking.scheduledDate).toLocaleDateString() %></td>
+                                    <td>
+                                        <% 
+                                        let statusClass = '';
+                                        switch(booking.status) {
+                                            case 'pending': statusClass = 'bg-secondary'; break;
+                                            case 'assigned': statusClass = 'bg-primary'; break;
+                                            case 'in-progress': statusClass = 'bg-info'; break;
+                                            case 'completed': statusClass = 'bg-success'; break;
+                                            case 'cancelled': statusClass = 'bg-danger'; break;
+                                            default: statusClass = 'bg-secondary';
+                                        }
+                                        %>
+                                        <span class="badge <%= statusClass %>"><%= booking.status %></span>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/bookings/<%= booking._id %>" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No bookings found for this provider.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('../../partials/footer') %> 

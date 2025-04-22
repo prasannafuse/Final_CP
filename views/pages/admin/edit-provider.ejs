@@ -1,0 +1,145 @@
+<%- include('../../partials/header') %>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Edit Service Provider</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/providers">Service Providers</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/providers/view/<%= provider._id %>"><%= provider.name %></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <%- include('../../partials/messages') %>
+
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Edit Provider Information</h5>
+        </div>
+        <div class="card-body">
+            <form action="/admin/providers/edit/<%= provider._id %>" method="POST">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" value="<%= provider.name %>" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" value="<%= provider.email %>" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="<%= provider.phone || '' %>">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Status <span class="text-danger">*</span></label>
+                        <div class="mt-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="active" id="activeTrue" value="true" <%= provider.isAvailable ? 'checked' : '' %> required>
+                                <label class="form-check-label" for="activeTrue">Active</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="active" id="activeFalse" value="false" <%= !provider.isAvailable ? 'checked' : '' %> required>
+                                <label class="form-check-label" for="activeFalse">Inactive</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Service Categories <span class="text-danger">*</span></label>
+                    <div class="row">
+                        <% 
+                        const categories = [
+                            'Plumbing', 'Electrical', 'Carpentry', 'Cleaning', 
+                            'Painting', 'Gardening', 'Appliance Repair', 'HVAC', 
+                            'Roofing', 'Pest Control'
+                        ];
+                        categories.forEach(category => { 
+                            const isSelected = provider.serviceCategories && 
+                                provider.serviceCategories.includes(category);
+                        %>
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="serviceCategories" 
+                                           value="<%= category %>" 
+                                           id="<%= category.toLowerCase().replace(' ', '') %>"
+                                           <%= isSelected ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="<%= category.toLowerCase().replace(' ', '') %>">
+                                        <%= category %>
+                                    </label>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <h5 class="text-muted mb-3">Change Password (Optional)</h5>
+                <p class="text-muted small">Leave blank to keep the current password</p>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="password" name="password" minlength="6">
+                        <div class="form-text">Password must be at least 6 characters</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="password2" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="password2" name="password2" minlength="6">
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt-3">
+                    <h6><i class="fas fa-info-circle"></i> Edit Tips</h6>
+                    <ul class="mb-0">
+                        <li><strong>Email Change:</strong> If you change the email address, the provider will need to use the new email to log in.</li>
+                        <li><strong>Status:</strong> Inactive providers cannot log in or be assigned to new jobs.</li>
+                        <li><strong>Password:</strong> Only fill in the password fields if you want to change the provider's password.</li>
+                    </ul>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12 text-end">
+                        <a href="/admin/providers/view/<%= provider._id %>" class="btn btn-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-success">Update Provider</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // JavaScript to ensure at least one service category is selected
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const checkboxes = document.querySelectorAll('input[name="serviceCategories"]:checked');
+            if (checkboxes.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one service category');
+            }
+            
+            // Password validation
+            const password = document.getElementById('password').value;
+            const password2 = document.getElementById('password2').value;
+            
+            if (password && password !== password2) {
+                e.preventDefault();
+                alert('Passwords do not match');
+            }
+        });
+    });
+</script>
+
+<%- include('../../partials/footer') %> 

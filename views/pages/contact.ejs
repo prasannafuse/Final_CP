@@ -1,0 +1,73 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+    <h1 class="mb-4">Contact Us</h1>
+    
+    <%- include('../partials/messages') %>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Send us a Message</h5>
+                    <form action="/contact" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="<%= typeof name != 'undefined' ? name : '' %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" value="<%= typeof email != 'undefined' ? email : '' %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="4" required><%= typeof message != 'undefined' ? message : '' %></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Contact Information</h5>
+                    <p class="card-text">Feel free to reach out to us with any questions or concerns.</p>
+                    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex">
+                            <i class="bi bi-geo-alt-fill me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Address</h6>
+                                <p class="mb-0">Vishwakarma Institute of Technology, Pune, India</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex">
+                            <i class="bi bi-telephone-fill me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Phone</h6>
+                                <p class="mb-0">+91-9373716355</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex">
+                            <i class="bi bi-envelope-fill me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Email</h6>
+                                <p class="mb-0">info@homeservice.com</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex">
+                            <i class="bi bi-clock-fill me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Hours</h6>
+                                <p class="mb-0">Monday - Friday: 9am - 5pm<br>Saturday: 10am - 2pm<br>Sunday: Closed</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %> 

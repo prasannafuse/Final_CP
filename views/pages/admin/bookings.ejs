@@ -1,0 +1,298 @@
+<%- include('../../partials/header') %>
+
+<div class="container">
+    <h1 class="mb-4">All Bookings</h1>
+    
+    <%- include('../../partials/messages') %>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <ul class="nav nav-pills mb-3" id="bookingTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="assigned-tab" data-bs-toggle="tab" data-bs-target="#assigned" type="button" role="tab" aria-controls="assigned" aria-selected="false">Assigned</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="confirmed-tab" data-bs-toggle="tab" data-bs-target="#confirmed" type="button" role="tab" aria-controls="confirmed" aria-selected="false">Confirmed</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" aria-controls="completed" aria-selected="false">Completed</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab" aria-controls="cancelled" aria-selected="false">Cancelled</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="tab-content" id="bookingTabsContent">
+        <!-- All Bookings -->
+        <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+            <div class="card">
+                <div class="card-body">
+                    <% if(bookings && bookings.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="bookingsTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Date & Time</th>
+                                        <th>Service</th>
+                                        <th>Customer</th>
+                                        <th>Status</th>
+                                        <th>Provider</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% bookings.forEach(booking => { %>
+                                        <tr>
+                                            <td><small class="text-muted"><%= booking._id %></small></td>
+                                            <td>
+                                                <%= new Date(booking.date).toLocaleDateString() %><br>
+                                                <small class="text-muted"><%= booking.time %></small>
+                                            </td>
+                                            <td><%= booking.service.name %></td>
+                                            <td>
+                                                <%= booking.user.name %><br>
+                                                <small class="text-muted"><%= booking.user.phone %></small>
+                                            </td>
+                                            <td>
+                                                <span class="badge rounded-pill 
+                                                    <% if(booking.status === 'pending') { %>bg-warning<% } %>
+                                                    <% if(booking.status === 'assigned') { %>bg-info<% } %>
+                                                    <% if(booking.status === 'confirmed') { %>bg-primary<% } %>
+                                                    <% if(booking.status === 'completed') { %>bg-success<% } %>
+                                                    <% if(booking.status === 'cancelled') { %>bg-danger<% } %>
+                                                    <% if(booking.status === 'rejected') { %>bg-secondary<% } %>
+                                                ">
+                                                    <%= booking.status.charAt(0).toUpperCase() + booking.status.slice(1) %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <% if(booking.provider) { %>
+                                                    <%= booking.provider.name %>
+                                                <% } else { %>
+                                                    <span class="text-muted">Not assigned</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal<%= booking._id %>">View</button>
+                                                    <% if(booking.status === 'pending') { %>
+                                                        <a href="/admin/bookings/assign/<%= booking._id %>" class="btn btn-success">Assign</a>
+                                                    <% } %>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">No bookings found</div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Bookings -->
+        <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+            <div class="card">
+                <div class="card-body">
+                    <% 
+                        const pendingBookings = bookings.filter(b => b.status === 'pending');
+                        if(pendingBookings.length > 0) { 
+                    %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date & Time</th>
+                                        <th>Service</th>
+                                        <th>Customer</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% pendingBookings.forEach(booking => { %>
+                                        <tr>
+                                            <td>
+                                                <%= new Date(booking.date).toLocaleDateString() %><br>
+                                                <small class="text-muted"><%= booking.time %></small>
+                                            </td>
+                                            <td><%= booking.service.name %></td>
+                                            <td>
+                                                <%= booking.user.name %><br>
+                                                <small class="text-muted"><%= booking.user.phone %></small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal<%= booking._id %>">View</button>
+                                                    <a href="/admin/bookings/assign/<%= booking._id %>" class="btn btn-success">Assign</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">No pending bookings found</div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Other Tab Panes (assigned, confirmed, completed, cancelled) -->
+        <% ['assigned', 'confirmed', 'completed', 'cancelled'].forEach(status => { %>
+            <div class="tab-pane fade" id="<%= status %>" role="tabpanel" aria-labelledby="<%= status %>-tab">
+                <div class="card">
+                    <div class="card-body">
+                        <% 
+                            const filteredBookings = bookings.filter(b => b.status === status);
+                            if(filteredBookings.length > 0) { 
+                        %>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date & Time</th>
+                                            <th>Service</th>
+                                            <th>Customer</th>
+                                            <th>Provider</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% filteredBookings.forEach(booking => { %>
+                                            <tr>
+                                                <td>
+                                                    <%= new Date(booking.date).toLocaleDateString() %><br>
+                                                    <small class="text-muted"><%= booking.time %></small>
+                                                </td>
+                                                <td><%= booking.service.name %></td>
+                                                <td>
+                                                    <%= booking.user.name %><br>
+                                                    <small class="text-muted"><%= booking.user.phone %></small>
+                                                </td>
+                                                <td>
+                                                    <% if(booking.provider) { %>
+                                                        <%= booking.provider.name %>
+                                                    <% } else { %>
+                                                        <span class="text-muted">Not assigned</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal<%= booking._id %>">View</button>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } else { %>
+                            <div class="alert alert-info">No <%= status %> bookings found</div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<!-- Booking Detail Modals -->
+<% if(bookings && bookings.length > 0) { %>
+    <% bookings.forEach(booking => { %>
+        <div class="modal fade" id="viewModal<%= booking._id %>" tabindex="-1" aria-labelledby="viewModalLabel<%= booking._id %>" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewModalLabel<%= booking._id %>">Booking Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Booking Information</h6>
+                                <p><strong>ID:</strong> <small class="text-muted"><%= booking._id %></small></p>
+                                <p><strong>Service:</strong> <%= booking.service.name %></p>
+                                <p><strong>Date:</strong> <%= new Date(booking.date).toLocaleDateString() %></p>
+                                <p><strong>Time:</strong> <%= booking.time %></p>
+                                <p><strong>Status:</strong> 
+                                    <span class="badge rounded-pill 
+                                        <% if(booking.status === 'pending') { %>bg-warning<% } %>
+                                        <% if(booking.status === 'assigned') { %>bg-info<% } %>
+                                        <% if(booking.status === 'confirmed') { %>bg-primary<% } %>
+                                        <% if(booking.status === 'completed') { %>bg-success<% } %>
+                                        <% if(booking.status === 'cancelled') { %>bg-danger<% } %>
+                                        <% if(booking.status === 'rejected') { %>bg-secondary<% } %>
+                                    ">
+                                        <%= booking.status.charAt(0).toUpperCase() + booking.status.slice(1) %>
+                                    </span>
+                                </p>
+                                <p><strong>Created:</strong> <%= new Date(booking.createdAt).toLocaleString() %></p>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h6>Customer Information</h6>
+                                <p><strong>Name:</strong> <%= booking.user.name %></p>
+                                <p><strong>Email:</strong> <%= booking.user.email %></p>
+                                <p><strong>Phone:</strong> <%= booking.user.phone %></p>
+                                <p><strong>Address:</strong> <%= booking.address %></p>
+                                <p><strong>City:</strong> <%= booking.city %></p>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Provider Information</h6>
+                                <% if(booking.provider) { %>
+                                    <p><strong>Name:</strong> <%= booking.provider.name %></p>
+                                    <p><strong>Email:</strong> <%= booking.provider.email %></p>
+                                    <p><strong>Phone:</strong> <%= booking.provider.phone %></p>
+                                <% } else { %>
+                                    <p class="text-muted">No provider assigned yet</p>
+                                <% } %>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h6>Notes</h6>
+                                <% if(booking.notes) { %>
+                                    <div class="mb-3">
+                                        <p><strong>Customer Notes:</strong></p>
+                                        <p class="text-muted"><%= booking.notes %></p>
+                                    </div>
+                                <% } else { %>
+                                    <p class="text-muted">No customer notes</p>
+                                <% } %>
+                                
+                                <% if(booking.providerNotes) { %>
+                                    <div>
+                                        <p><strong>Provider Notes:</strong></p>
+                                        <p class="text-muted"><%= booking.providerNotes %></p>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <% if(booking.status === 'pending') { %>
+                            <a href="/admin/bookings/assign/<%= booking._id %>" class="btn btn-primary">Assign Provider</a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+<% } %>
+
+<%- include('../../partials/footer') %> 

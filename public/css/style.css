@@ -1,0 +1,63 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Arial', sans-serif;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Hero Section */
+.hero {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 7rem 0;
+    text-align: center;
+    margin-top: -1.5rem;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Service Cards */
+.service-card {
+    height: 100%;
+    transition: transform 0.3s;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Dashboard cards */
+.col-md-3 > a > .card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.col-md-3 > a > .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.col-md-3 > a > .card:hover .card-footer {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.col-md-3 > a > .card:hover i {
+    transform: scale(1.1);
+}
+
+.col-md-3 > a > .card i {
+    transition: transform 0.3s ease;
+} 
